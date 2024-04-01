@@ -1,0 +1,9 @@
+.env
+.bak
+.dat
+.dir
+db.sqlite3
+django.log
+media
+
+celerybeat-schedule.* 
