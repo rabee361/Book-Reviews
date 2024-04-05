@@ -1,10 +1,8 @@
 from typing import Any
 from django.db import models
-from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import Avg , Count
+from django.db.models import Avg
 from django.contrib.auth.models import AbstractUser
-from django.utils.functional import cached_property
 
 
 
@@ -18,7 +16,10 @@ class Genre(models.Model):
 
 class CustomUser(AbstractUser):
     genres = models.ManyToManyField(Genre)
-    image = models.ImageField(upload_to='users', default='default/account.png')
+    image = models.ImageField(upload_to='users', default='defaults/account.png')
+    want_to_read = models.ManyToManyField('Book',related_name="want_to_read_users", blank=True)
+    currently_reading = models.ManyToManyField('Book',related_name="currently_users", blank=True)
+    read = models.ManyToManyField('Book',related_name="read_users", blank=True)
 
     def __str__(self) -> str:
         return self.username
@@ -45,6 +46,7 @@ class Author(models.Model):
 
 class Quote(models.Model):
     text = models.TextField(max_length=500)
+    author = models.ForeignKey(Author , on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f'{self.text[:50]}...'
@@ -52,19 +54,22 @@ class Quote(models.Model):
 
 
 class Book(models.Model):
-    LANGUAGES = (
-        ('en' , 'English'),
-        ('ar' , 'Arabic')
-    )
-    name = models.CharField(max_length=150 , db_index=True , default="none")
+    name = models.CharField(max_length=150 , db_index=True)
     cover = models.ImageField(upload_to='covres/')
     about = models.TextField(default='none')
     author = models.ManyToManyField(Author)
     pages = models.IntegerField(default=250)
-    language = models.CharField(max_length=30,choices=LANGUAGES , default='en')
     genre = models.ManyToManyField(Genre)
     quotes = models.ManyToManyField(Quote ,blank=True)
 
+    @property
+    def want_to_read_images(self):
+        return self.want_to_read_users.values('image')[0:3]
+
+    @property
+    def currently_reading_images(self):
+        return self.currently_users.values('image')[0:3]
+    
     @property
     def avg_rating(self):
         return self.review_set.only('rating').aggregate(Avg('rating'))['rating__avg']
@@ -73,6 +78,16 @@ class Book(models.Model):
     def total_reviews(self):
         return self.review_set.count()
 
+    @property
+    def total_want_to_read(self):
+        return self.want_to_read_users.count()
+    
+
+    @property
+    def total_read(self):
+        return self.read_users.count()
+    
+
     def __str__(self) -> str:
         author_names = ", ".join([str(author) for author in self.author.all()])
         return f'{self.name} - {author_names}'
@@ -80,12 +95,6 @@ class Book(models.Model):
 
 
 
-class ReadingList(models.Model):
-    user = models.ForeignKey(CustomUser , on_delete=models.CASCADE)
-    books = models.ManyToManyField(Book)
-
-    def __str__(self) -> str:
-        return self.user.username
 
 
 
@@ -116,6 +125,8 @@ class Review(models.Model):
     def total_likes(self):
         return self.likes.count()
 
+    def total_comments(self):
+        return self.comments.count()
 
 
 class Message(models.Model):
@@ -141,15 +152,17 @@ class Post(models.Model):
 
 
 
+class ProductManager(models.Manager):
+    def get_queryset(self) -> models.QuerySet:
+        return super().get_queryset().filter(name='test')
+
+
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
 
-    def delete(self,*args,**kwargs):
-        print(f"Deleting {self.name}")
-        super().delete(*args, **kwargs)
-        print(f"{self.name} has been deleted")
-
+    my_manager = ProductManager()
+    objects = models.Manager()
 
     def __str__(self) -> str:
         return self.name

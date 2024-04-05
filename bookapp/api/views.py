@@ -19,6 +19,8 @@ from rest_framework import viewsets
 from django.db.models import F , Q , Sum , Window
 from django.db.models.functions import Rank
 import logging
+from django.db import transaction
+
 
 logger = logging.getLogger('django')
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -70,15 +72,6 @@ class Logout(APIView):
 
 
 
-class AddToReadingList(APIView):
-    def post(self,request,book_id):
-        reading_list = ReadingList.objects.get(user=request.user)
-        book = Book.objects.get(id=book_id)
-        reading_list.books.add(book)
-        serializer = ReadingListSerializer(reading_list,many=False)
-        return Response(serializer.data , status=status.HTTP_200_OK)
-
-
 
 class SelectGenres(APIView):
     def post(self,request):
@@ -116,12 +109,6 @@ class GetBook(RetrieveAPIView):
 
 
 
-class GetReadingList(RetrieveUpdateDestroyAPIView):
-    queryset = ReadingList
-    serializer_class = ReadingListSerializer
-
-
-
 
 #----get all genres----#
 class GetGenres(ListCreateAPIView):
@@ -151,6 +138,49 @@ class RelatedBooks(APIView):
         serializer = BookSerializer(books,many=True,context={'request':request})
         return Response(serializer.data , status=status.HTTP_200_OK)
     
+
+
+class ListQuote(ListAPIView):
+    queryset = Quote.objects.all()
+    serializer_class = QuoteSerialzier
+
+
+
+class WantToRead(APIView):
+    def post(self,request,pk):
+        book = Book.objects.get(id=pk)
+        user = request.user
+        user.want_to_read.add(book)
+        serializer = CustomUserSerializer(user,many=False)
+        return Response({
+            "your want to read list":serializer.data['want_to_read']
+        })
+
+
+
+
+
+class CurrentlyReading(APIView):
+    def post(self,request,pk):
+        book = Book.objects.get(id=pk)
+        user = request.user
+        user.currently_reading.add(book)
+        serializer = CustomUserSerializer(user,many=False)
+        return Response({
+            "your currently reading list":serializer.data['currently_reading']
+        })
+
+
+        
+class Read(APIView):
+    def post(self,request,pk):
+        book = Book.objects.get(id=pk)
+        user = request.user
+        user.read.add(book)
+        serializer = CustomUserSerializer(user,many=False)
+        return Response({
+            "your read books list":serializer.data['read']
+        })
 
 
 #-----sign up using apiview-----#
@@ -216,3 +246,11 @@ class Test(APIView):
 class ProductView(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+
+
+class TestAPiView(APIView):
+    def get(self,request):
+        products = Product.my_manager.get(id=33)
+        serializer = ProductSerializer(products,many=True)
+        return Response(serializer.data)

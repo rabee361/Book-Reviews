@@ -11,7 +11,7 @@ from django.contrib.auth.password_validation import validate_password
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username','email','first_name','last_name','image','total_reviews']
+        fields = ['username','email','first_name','last_name','image','total_reviews','want_to_read','currently_reading','read']
 
 
    
@@ -23,9 +23,12 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class QuoteSerialzier(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.name',read_only=True)
+    image = serializers.ImageField(source='author.image',read_only=True)
+
     class Meta:
         model = Quote
-        fields = ['text']
+        fields = ['text','author','author_name','image']
 
     
 
@@ -54,7 +57,7 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields  = ['id','name','author','avg_rating','total_reviews','cover','about','quotes','genre','language','pages']
+        fields  = ['id','name','author','avg_rating','total_reviews','cover','about','quotes','genre','pages','total_want_to_read','total_read','want_to_read_images','currently_reading_images']
    
     def get_cover(self, obj):
         request = self.context.get('request')
@@ -63,12 +66,6 @@ class BookSerializer(serializers.ModelSerializer):
         return None
 
 
-
-
-class ReadingListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReadingList
-        fields = '__all__'
 
 
 
@@ -119,7 +116,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['user','book_name','text','rating','created','likes','total_likes']
+        fields = ['user','book_name','text','rating','created','likes','total_likes','total_comments']
 
     def get_created(self,obj):
         return obj.created.strftime('%Y-%m-%d')
