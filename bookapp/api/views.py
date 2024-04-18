@@ -26,14 +26,7 @@ logger = logging.getLogger('django')
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class CustomPagination(PageNumberPagination):
-    page_size = 1
-
-
-
-#-----sign up using generic view-----#
-class SignUp2(CreateAPIView):
-    serializer_class = UserSerializer
-
+    page_size = 12
 
 
 
@@ -43,6 +36,16 @@ class whoami(APIView):
         serializer = CustomUserSerializer(request.user,many=False)
         return Response(serializer.data)
 
+
+
+class SignUp(APIView):
+    def post(self,request):
+        serializer = CustomUserSerializer(data=request.data , context={"request":request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data , status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            
 
 
 
@@ -88,7 +91,7 @@ class SelectGenres(APIView):
 class AllBooks(ListAPIView):
     queryset = Book.objects.prefetch_related('author','genre','quotes').all()
     serializer_class = BookSerializer
-    # pagination_class = CustomPagination
+    pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = BookFilter
 

@@ -16,7 +16,7 @@ class Genre(models.Model):
 
 class CustomUser(AbstractUser):
     genres = models.ManyToManyField(Genre)
-    image = models.ImageField(upload_to='users', default='defaults/account.png')
+    image = models.ImageField(upload_to='users/', default='defaults/account.jpg')
     want_to_read = models.ManyToManyField('Book',related_name="want_to_read_users", blank=True)
     currently_reading = models.ManyToManyField('Book',related_name="currently_users", blank=True)
     read = models.ManyToManyField('Book',related_name="read_users", blank=True)
@@ -57,18 +57,18 @@ class Book(models.Model):
     name = models.CharField(max_length=150 , db_index=True)
     cover = models.ImageField(upload_to='covres/')
     about = models.TextField(default='none')
-    author = models.ManyToManyField(Author)
+    author = models.ForeignKey(Author , on_delete=models.CASCADE)
     pages = models.IntegerField(default=250)
     genre = models.ManyToManyField(Genre)
     quotes = models.ManyToManyField(Quote ,blank=True)
 
     @property
     def want_to_read_images(self):
-        return self.want_to_read_users.values('image')[0:3]
+        return self.want_to_read_users.all()[0:3]
 
     @property
     def currently_reading_images(self):
-        return self.currently_users.values('image')[0:3]
+        return self.currently_users.all()[0:3]
     
     @property
     def avg_rating(self):
@@ -84,13 +84,12 @@ class Book(models.Model):
     
 
     @property
-    def total_read(self):
-        return self.read_users.count()
+    def total_reading(self):
+        return self.currently_users.count()
     
 
     def __str__(self) -> str:
-        author_names = ", ".join([str(author) for author in self.author.all()])
-        return f'{self.name} - {author_names}'
+        return f'{self.name} - {self.author.name}'
 
 
 
@@ -144,6 +143,7 @@ class Post(models.Model):
     author = models.ForeignKey(CustomUser , on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     text = models.TextField()
+    cover = models.ImageField(upload_to='posts/',default='defaults/post.jpg',blank=True)
     date = models.DateTimeField(auto_now_add=True)
     genres = models.ManyToManyField(Genre)
 

@@ -14,7 +14,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = ['username','email','first_name','last_name','image','total_reviews','want_to_read','currently_reading','read']
 
 
-   
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
@@ -50,42 +49,54 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(many=True,read_only=True)
+    author = AuthorSerializer(read_only=True)
     quotes = QuoteSerialzier(many=True,read_only=True)
     genre = GenreSerializer(many=True , read_only=True)
-    cover = serializers.SerializerMethodField()
+    want_to_read_images = serializers.SerializerMethodField()
+    currently_reading_images = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
-        fields  = ['id','name','author','avg_rating','total_reviews','cover','about','quotes','genre','pages','total_want_to_read','total_read','want_to_read_images','currently_reading_images']
+        fields  = ['id','name','author','avg_rating','total_reviews','cover','about','quotes','genre','pages','total_want_to_read','total_reading','want_to_read_images','currently_reading_images']
    
-    def get_cover(self, obj):
+    
+    def get_want_to_read_images(self,obj):
         request = self.context.get('request')
-        if obj.cover:
-            return request.build_absolute_uri(obj.cover.url)
-        return None
+        arr = []
+        for i in obj.want_to_read_images:
+            x = request.build_absolute_uri(i.image.url)
+            arr.append(x)
+        return arr
+
+    def get_currently_reading_images(self,obj):
+        request = self.context.get('request')
+        arr = []
+        for i in obj.currently_reading_images:
+            x = request.build_absolute_uri(i.image.url)
+            arr.append(x)
+        return arr
 
 
 
 
-
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+
     class Meta:
         model = CustomUser
         fields = ['username','image','email','password','password2']
 
     def validate(self, data):
         if data['password'] != data['password2']:
-            return serializers.ValidationError("passwords don't match")
+            raise serializers.ValidationError("passwords don't match")
         validate_password(data['password'])
         return data
     
     def create(self, validated_data):
         request = self.context.get('request')
         validated_data.pop('password2')
-        user = User.objects.create_user(**validated_data)
+        user = CustomUser.objects.create_user(**validated_data)
         user.is_staff = True
         user.save()
         login(request,user)
@@ -96,7 +107,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many=False,read_only=True)
+    user = CustomUserSerializer(many=False,read_only=True)
     class Meta:
         model = Message
         fields = ['user','text']

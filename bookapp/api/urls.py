@@ -10,6 +10,7 @@ router.register(r'products', ProductView)
 
 urlpatterns = [
     path('log-in/' , Login.as_view(), name="login"),
+    path('sign-up/' , SignUp.as_view() , name='sign-up'),
     path('books/' , AllBooks.as_view() , name="books"),
     path('books/<str:pk>/' , GetBook.as_view() , name="single_book"),
     path('whoami/'  ,whoami.as_view() , name="whoami"),
@@ -23,7 +24,6 @@ urlpatterns = [
     path('authors/' , ListAuthors.as_view() , name="authors"),
     path('author/<str:pk>' , GetAuthor.as_view() , name="get-author"),
     path('related-books/<str:pk>/' , RelatedBooks.as_view() , name="related_books"),
-    path('sign_up/', SignUp2.as_view() , name="sign_up"),
     path('login/' , Login.as_view() , name="login"),
     path('logout/' , Logout.as_view() , name="logout"),
     path('message/' , WriteMessage.as_view() , name="message"),
