@@ -9,10 +9,10 @@ class CustomUserAdmin(UserAdmin):
             ('User Information',
                 {'fields':('username', 'email','first_name', 'last_name','image','want_to_read','currently_reading','read')}
             ),
-            ('Permissions', 
+            ('Permissions',
                 {'fields':('is_staff', 'is_superuser', 'is_active', 'groups','user_permissions')}
             ),
-            ('Registration', 
+            ('Registration',
                 {'fields':('date_joined', 'last_login',)}
         )
     )

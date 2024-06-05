@@ -82,7 +82,6 @@ class Book(models.Model):
     def total_want_to_read(self):
         return self.want_to_read_users.count()
     
-
     @property
     def total_reading(self):
         return self.currently_users.count()

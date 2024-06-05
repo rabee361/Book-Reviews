@@ -1,8 +1,35 @@
 from rest_framework import serializers
 from bookapp.models import *
 from django.contrib.auth.models import User
-from django.contrib.auth import login
+from django.contrib.auth import  authenticate , login
 from django.contrib.auth.password_validation import validate_password
+from rest_framework_simplejwt.tokens import TokenError, RefreshToken
+
+
+
+
+
+
+
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        user = authenticate(request=self.context.get('request'), username=username, password=password)
+        if not user:
+            raise serializers.ValidationError({"error":"لا يوجد مستخدم بهذه المعلومات"})
+        if not user.is_active:
+            raise serializers.ValidationError({"error":"هذا الحساب غير مفعل"})
+
+        data['user'] = user
+        return data
 
 
 

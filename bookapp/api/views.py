@@ -31,11 +31,6 @@ class CustomPagination(PageNumberPagination):
 
 
 
-class whoami(APIView):
-    def get(self,request):
-        serializer = CustomUserSerializer(request.user,many=False)
-        return Response(serializer.data)
-
 
 
 class SignUp(APIView):
@@ -51,19 +46,20 @@ class SignUp(APIView):
 
 #-----login-----#
 class Login(APIView):
-    def get(self,request):
-        return Response('hello , you can login here')
     def post(self,request):
-        username = request.data['username']
-        password = request.data['password']
-        if not username or not password:
-            return Response("error")
-        user = authenticate(username=username , password=password)
-        if user:
-            login(request,user)
-            return Response("you're in !!!" , status=status.HTTP_200_OK)
-            # return redirect('books')
-        return Response('error' , status=status.HTTP_404_NOT_FOUND)
+        serializer = LoginSerializer(data=request.data , context={'request':request})
+        if serializer.is_valid(raise_exception=True):
+            user = CustomUser.objects.get(username = request.data['username'])
+            token = RefreshToken.for_user(user)
+            data = serializer.data
+            data['tokens'] = {'refresh':str(token), 'access':str(token.access_token)}
+            return Response(data , status=status.HTTP_200_OK)
+        else:
+            return Response("error",status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 
 
 #----logout----#
@@ -98,6 +94,7 @@ class AllBooks(ListAPIView):
 
 
 class FeaturedBooks(APIView):
+    # permission_classes = [IsAuthenticated] 
     def get(self,request):
         books = Book.objects.all().order_by('-id')
         serializer = BookSerializer(books,many=True,context={'request': request})
@@ -245,15 +242,3 @@ class Test(APIView):
 
 
 
-
-class ProductView(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-
-
-
-class TestAPiView(APIView):
-    def get(self,request):
-        products = Product.my_manager.get(id=33)
-        serializer = ProductSerializer(products,many=True)
-        return Response(serializer.data)

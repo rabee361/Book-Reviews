@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('' , include('bookapp.urls')),
-    path('api/' , include('bookapp.api.urls'))
+    path('api/' , include('bookapp.api.urls')),
 ]
 
 urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
