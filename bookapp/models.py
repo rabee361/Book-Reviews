@@ -3,7 +3,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Avg
 from django.contrib.auth.models import AbstractUser
-
+from datetime import datetime
 
 
 class Genre(models.Model):
@@ -61,6 +61,8 @@ class Book(models.Model):
     pages = models.IntegerField(default=250)
     genre = models.ManyToManyField(Genre)
     quotes = models.ManyToManyField(Quote ,blank=True)
+    published = models.CharField(max_length=10,default="1980")
+    created = models.DateTimeField(auto_now_add=True , null=True , blank=True)
 
     @property
     def want_to_read_images(self):

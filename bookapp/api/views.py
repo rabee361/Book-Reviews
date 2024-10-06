@@ -13,7 +13,6 @@ from django.contrib.auth import login , logout , authenticate
 from django.shortcuts import redirect
 from rest_framework import status
 from django.contrib.auth.decorators import login_required
-import stripe 
 from django.conf import settings 
 from rest_framework import viewsets
 from django.db.models import F , Q , Sum , Window
@@ -22,14 +21,8 @@ import logging
 from django.db import transaction
 
 
-logger = logging.getLogger('django')
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 class CustomPagination(PageNumberPagination):
     page_size = 12
-
-
-
 
 
 
@@ -90,6 +83,26 @@ class AllBooks(ListAPIView):
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = BookFilter
+
+
+
+class FeaturedBooks(APIView):
+    # permission_classes = [IsAuthenticated] 
+    def get(self,request):
+        books = Book.objects.all().order_by('-id')
+        serializer = BookSerializer(books,many=True,context={'request': request})
+        return Response(serializer.data)
+
+
+
+
+class LatestBooks(APIView):
+    # permission_classes = [IsAuthenticated] 
+    def get(self,request):
+        books = Book.objects.all().order_by('-created')
+        serializer = BookSerializer(books,many=True,context={'request': request})
+        return Response(serializer.data)
+
 
 
 

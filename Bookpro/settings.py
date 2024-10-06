@@ -60,11 +60,6 @@ LOGGING = {
     },
 }
 
-
-STRIPE_SECRET_KEY = 'your_secret_key_here'
-STRIPE_PUBLISHABLE_KEY = 'your_publishable_key_here'
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -76,8 +71,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'celery',
-    'django_celery_beat',
     'bookapp',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
@@ -88,7 +81,6 @@ INSTALLED_APPS = [
 # ATOMIC_REQUESTS = True
 
 MIDDLEWARE = [
-    # 'django.middleware.gzip.GZipMiddleware',#### to make the response smaller
     'silk.middleware.SilkyMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -98,16 +90,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'bookapp.middleware.CustomMiddleware',
-    # 'bookapp.middleware.CountRequestsMiddleware'
 ]
 
 ROOT_URLCONF = 'Bookpro.urls'
 CORS_ALLOW_ALL_ORIGINS = True
 SILKY_META = True
 CSRF_COOKIE_USED = True
-
-
 
 
 REST_FRAMEWORK = {
@@ -196,8 +184,9 @@ AUTH_USER_MODEL = 'bookapp.CustomUser'
 
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
 
@@ -208,8 +197,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672/'
-
 EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_HOST_USER='rha60540@gmail.com'
@@ -218,15 +205,6 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_TIMEOUT=300
 
-
-from celery.schedules import crontab
-from datetime import datetime
-CELERY_BEAT_SCHEDULE = {
-    'sen_book_every_1_minute': {
-        'task': 'bookapp.tasks.send_book',
-        'schedule': 30, # crontab() runs the tasks every minute
-    },
-}
 
 
 

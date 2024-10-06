@@ -84,8 +84,8 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields  = ['id','name','author','avg_rating','total_reviews','cover','about','quotes','genre','pages','total_want_to_read','total_reading','want_to_read_images','currently_reading_images']
-   
+        fields = '__all__'
+
     
     def get_want_to_read_images(self,obj):
         request = self.context.get('request')
