@@ -48,6 +48,7 @@ services:
   nginx:
     image: nginx
     build: ./nginx
+    container_name: nginx_con
     ports:
       - "9000:80"
     volumes:  
@@ -67,5 +68,5 @@ networks:
 
 volumes:
   postgres_data:
-  media_volume:
-  static_volume:
+  - media_volume:/app/media
+  - static_volume:/app/static
