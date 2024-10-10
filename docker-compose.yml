@@ -6,7 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
     # command: python manage.py runserver 0.0.0.0:8000 --settings=Bookpro.settings
-    command: gunicorn Bookpro.wsgi:application --bind 0.0.0.0:8000
+    command: sh -c "python manage.py makemigrations && 
+                    python manage.py migrate &&
+                    gunicorn Bookpro.wsgi:application --bind 0.0.0.0:8000"
+
     container_name: bookpro_con
     volumes:
       - .:/app
@@ -50,7 +53,7 @@ services:
     build: ./nginx
     container_name: nginx_con
     ports:
-      - "9000:80"
+      - 1337:80
     volumes:  
       - static_volume:/app/static
       - media_volume:/app/media
