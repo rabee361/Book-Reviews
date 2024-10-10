@@ -16,9 +16,6 @@ RUN pip install -r /app/requirements.txt
 # Copy project
 COPY . /app
 
-RUN mkdir /app/static
-RUN mkdir /app/media
-
 RUN python manage.py collectstatic --no-input
 
 CMD ["python", "manage.py", "runserver" ,"0.0.0.0:8000"]

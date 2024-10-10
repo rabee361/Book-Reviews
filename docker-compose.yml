@@ -50,7 +50,7 @@ services:
     build: ./nginx
     ports:
       - "9000:80"
-    volumes:
+    volumes:  
       - static_volume:/app/static
       - media_volume:/app/media
     depends_on:
