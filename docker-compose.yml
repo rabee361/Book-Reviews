@@ -49,8 +49,8 @@ services:
 
 
   nginx:
-    image: nginx:1.25
-    # build: ./nginx
+    image: nginx
+    build: ./nginx
     container_name: nginx_con
     ports:
       - 1337:80
