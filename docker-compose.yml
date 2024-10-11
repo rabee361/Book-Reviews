@@ -48,20 +48,20 @@ services:
         - books_network
 
 
-  nginx:
-    image: nginx:1.25
-    # build: ./nginx
-    container_name: nginx_con
-    ports:
-      - 1337:80
-    volumes:  
-      - static_volume:/app/static
-      - media_volume:/app/media
-    depends_on:
-      - web
-    restart: always
-    networks:
-      books_network:
+  # nginx:
+  #   image: nginx:1.25
+  #   # build: ./nginx
+  #   container_name: nginx_con
+  #   ports:
+  #     - 1337:80
+  #   volumes:  
+  #     - static_volume:/app/static
+  #     - media_volume:/app/media
+  #   depends_on:
+  #     - web
+  #   restart: always
+  #   networks:
+  #     books_network:
 
 
 networks:
