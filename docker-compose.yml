@@ -49,7 +49,6 @@ services:
 
 
   nginx:
-    image: nginx
     build: ./nginx
     container_name: nginx_con
     ports:
