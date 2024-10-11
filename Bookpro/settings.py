@@ -33,7 +33,8 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = [
     '85.31.237.33',
     '127.0.0.1',
-    'localhost'
+    'localhost',
+    'web'
 ]
 
 
