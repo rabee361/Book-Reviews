@@ -13,8 +13,8 @@ services:
     # container_name: bookpro_con
     volumes:
       - .:/app
-      - static_volume:/app/static
-      - media_volume:/app/media
+      # - static_volume:/app/static
+      # - media_volume:/app/media
     ports:
       - 8000:8000
     restart: always
@@ -48,21 +48,21 @@ services:
         - books_network
 
 
-  nginx:
-    # build: ./nginx
-    image: nginx:latest
-    # container_name: nginx_con
-    ports:
-      - 80:80
-    volumes:  
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - static_volume:/app/static
-      - media_volume:/app/media
-    depends_on:
-      - web
-    restart: always
-    networks:
-      books_network:
+  # nginx:
+  #   # build: ./nginx
+  #   image: nginx:latest
+  #   container_name: nginx_con
+  #   ports:
+  #     - 80:80
+  #   volumes:  
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - static_volume:/app/static
+  #     - media_volume:/app/media
+  #   depends_on:
+  #     - web
+  #   restart: always
+  #   networks:
+  #     books_network:
 
 
 networks:
@@ -72,5 +72,5 @@ networks:
 
 volumes:
   postgres_data:
-  media_volume:
-  static_volume:
+  # media_volume:
+  # static_volume:
