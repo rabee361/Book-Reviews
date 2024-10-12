@@ -13,8 +13,8 @@ services:
     # container_name: bookpro_con
     volumes:
       - .:/app
-      # - static_volume:/app/static
-      # - media_volume:/app/media
+      - /var/www/books/static:/app/static
+      - /var/www/books/media:/app/media
     ports:
       - 8000:8000
     restart: always
